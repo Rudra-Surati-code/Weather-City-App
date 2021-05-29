@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="shortcut icon" href="https://i.pinimg.com/originals/77/0b/80/770b805d5c99c7931366c2e84e88f251.png" type="image/x-icon">
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+    integrity="sha512-PgQMlq+nqFLV4ylk1gwUOgm6CtIIXkKwaIHp/PAIWHzig/lKZSEGKEysh0TCVbHJXCLN7WetD8TFecIky75ZfQ=="
+    crossorigin="anonymous"
+     />
+    <link
+    href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500&display=swap"
+    rel="stylesheet"
+     />
+     <script
+     src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+     ></script>
+    <style>
+        body {
+            font-size: 10px;
+            font-family: Roboto, sans-serif;
+            margin: 0;
+            display: grid;
+            height: 100vh;
+            width: 100%;
+            place-items: center;
+            overflow: hidden;
+        }
+        .c-checkbox {
+            display: none;
+        }
+        .c-checkbox:checked + .c-formContainer .c-form {
+            width: 37.5em;
+        }
+        .c-checkbox:checked + .c-formContainer .c-form__toggle {
+            visibility: hidden;
+            opacity: 0;
+            transform: scale(0.7);
+        }
+        .c-checkbox:checked + .c-formContainer .c-form__input, .c-checkbox:checked + .c-formContainer .c-form__buttonLabel {
+            transition: 0.2s 0.1s;
+            visibility: visible;
+            opacity: 1;
+            transform: scale(1);
+        }
+        .c-checkbox:not(:checked) + .c-formContainer .c-form__input:required:valid ~ .c-form__toggle::before, .c-checkbox:checked + .c-formContainer .c-form__input:required:valid ~ .c-form__toggle::before {
+            content: 'Thank You! \1F60A';
+        }
+        .c-checkbox:not(:checked) + .c-formContainer .c-form__input:required:valid ~ .c-form__toggle {
+            pointer-events: none;
+            cursor: default;
+        }
+        .c-formContainer, .c-form, .c-form__toggle {
+            width: 20em;
+            height: 6.25em;
+        }
+        .c-formContainer {
+            position: relative;
+            font-weight: 700;
+        }
+        .c-form, .c-form__toggle {
+            position: absolute;
+            border-radius: 6.25em;
+            background-color: #fff;
+            transition: 0.2s;
+        }
+        .c-form {
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.625em;
+            box-sizing: border-box;
+            box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+        }
+        .c-form__toggle {
+            color: #ff7b73;
+            top: 0;
+            cursor: pointer;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .c-form__toggle::before {
+            font-size: 1.75em;
+            content: attr(data-title);
+        }
+        .c-form__input, .c-form__button {
+            font: inherit;
+            border: 0;
+            outline: 0;
+            border-radius: 5em;
+            box-sizing: border-box;
+        }
+        .c-form__input, .c-form__buttonLabel {
+            font-size: 1.75em;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.7);
+            transition: 0s;
+        }
+        .c-form__input {
+            color: #fcc;
+            height: 100%;
+            width: 100%;
+            padding: 0 0.714em;
+        }
+        .c-form__input::placeholder {
+            color: currentColor;
+        }
+        .c-form__input:required:valid {
+            color: #ff7b73;
+        }
+        .c-form__input:required:valid + .c-form__buttonLabel {
+            color: #fff;
+        }
+        .c-form__input:required:valid + .c-form__buttonLabel::before {
+            pointer-events: initial;
+        }
+        .c-form__buttonLabel {
+            color: #ffaea9;
+            height: 100%;
+            width: auto;
+        }
+        .c-form__buttonLabel::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            cursor: pointer;
+        }
+        .c-form__button {
+            color: inherit;
+            position: absolute;
+            right: 0;
+            height: 100%;
+            width: 5em;
+            background-color: #ff7b73;
+            cursor: pointer;
+        }
+        #c-error {
+            position: absolute;
+            top: 70px;
+            font-size: 20px;
+        }
+
+        * {
+            padding: 0;
+            margin: 0;
+            /* font-family: "Jost", sans-serif; */
+            font-family: "Quicksand", sans-serif;
+        }
+
+        body {
+            background: #f3f2ef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .box {
+            width: 20vw;
+            height: 60vh;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.2rem 3rem rgba(0, 0, 0, 0.2);
+            background: #a5bbdd;
+            position: relative;
+            overflow: hidden;
+            transform: translate3d(0, 0, 0);
+            min-width: 20rem;
+            min-height: 35rem;
+        }
+
+        .wave {
+            opacity: 0.3;
+            position: absolute;
+            top: 125%;
+            left: 50%;
+            background: white;
+            width: 50rem;
+            height: 50rem;
+            margin-left: -25rem;
+            margin-top: -25rem;
+            transform-origin: 50% 48%;
+            border-radius: 43%;
+            animation: drift 3000ms infinite linear;
+            z-index: 1;
+        }
+
+        .wave.-three {
+            animation: drift 5000ms infinite linear;
+            z-index: 2 !important;
+            opacity: 0.2;
+        }
+
+        .wave.-two {
+            animation: drift 7000ms infinite linear;
+            opacity: 0.1;
+            z-index: 3 !important;
+        }
+
+        .box:after {
+            content: "";
+            display: block;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 11;
+            transform: translate3d(0, 0, 0);
+        }
+
+        @keyframes drift {
+            from {
+            transform: rotate(0deg);
+            }
+            from {
+            transform: rotate(360deg);
+            }
+        }
+        .info {
+            position: absolute;
+            top: 60%;
+            width: 100%;
+            height: 45%;
+            z-index: 4;
+        }
+
+        .location {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-weight: 800;
+            font-size: 2rem;
+        }
+
+        .fa-street-view {
+            animation: rotates 3s linear infinite alternate;
+        }
+
+        @keyframes rotates {
+            from {
+            transform: translateX(-0.5rem);
+            }
+            to {
+            transform: translateX(0.5rem);
+            }
+        }
+
+        #date {
+            text-align: center;
+            margin-top: 0.5rem;
+            color: #57606f;
+            font-size: 10px;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        .temp {
+            margin-top: 2.5rem;
+            text-align: center;
+            font-size: 2rem;
+        }
+
+        .tempmin_max {
+            text-align: center;
+            margin-top: 0.3rem;
+            font-weight: 300;
+            font-size: 10px;
+            color: #57606f;
+        }
+
+        #weathercon {
+            height: 55%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3em;
+        }
+
+        #weathercon .fas {
+            font-size: 6rem;
+            animation: fas-anime 3s linear infinite alternate;
+        }
+
+        @keyframes fas-anime {
+            from {
+            transform: scale(1.1);
+            }
+            to {
+            transform: scale(1.5);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .box {
+                width: 100vw;
+                height: 80vh;
+            }
+
+            .wave {
+                top: 130%;
+            }
+
+            #weathercon {
+                font-size: 5em;
+            }
+
+            .info {
+                font-size: 1.5rem;
+            }
+        }
+        @media (max-height: 500px) {
+            .box {
+                height: 80vh;
+            }
+
+            .wave {
+                top: 0%;
+            }
+        }
+        body > span {
+            width: 100vw;
+            text-align: center;
+            color: grey;
+        }
+
+        .description {
+            position: absolute;
+            top: 5%;
+            font-size: medium;
+            text-transform: capitalize;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body onload="check();">
+
+    <div id="loader" style="width: 100%; height: 100vh; z-index: 99999999; background-color: #eee; display: grid; place-items: center; overflow: hidden; position: fixed;">
+        <div class="fas" style="text-align: center;"><img src="https://i.pinimg.com/originals/77/0b/80/770b805d5c99c7931366c2e84e88f251.png" width="100"><br><h1>Weather App</h1></div>
+    </div>
+    <br>
+    <br>
+
+    <div class="gdfgkhj">
+        <input class="c-checkbox" type="checkbox" id="checkbox">
+        <div class="c-formContainer">
+        <div class="c-form" action="">
+            <input style="border: none; outline: none;" class="c-form__input" placeholder="Enter Your City Name" autocomplete="off" type="country" required>
+            <label class="c-form__buttonLabel" for="checkbox">
+            <button class="c-form__button" type="button" onclick="goButton();">GO</button>
+            </label>
+            <label class="c-form__toggle" for="checkbox" data-title="Click Me"></label>
+        </div>
+        <label id="c-error"></label>
+        </div>
+    </div>
+
+    <div class="container">
+        <div style="text-align: center;">
+            <button id="logout" onclick="logout();" style="display: none; cursor: pointer;background-color: transparent; border: none; outline: none; font-size: 2rem; color: red; font-weight: bold; ">Logout</button>
+        </div>
+        <br>
+        <br>
+    
+        <div class="box" style="display: none; ">
+            <div class="wave -one"></div>
+            <div class="wave -two"></div>
+            <div class="wave -three"></div>
+    
+            <div id="weathercon"></div>
+    
+            <div class="info">
+                <h2 class="location" id="loc"></h2>
+                <p id="date"></p>
+                <h1 class="temp" id="temp"></h1>
+                <h3 class="tempmin_max" id="tempmin_max"></h3>
+                </div>
+                <p class="description" id="dec"></p>
+            </div>
+    </div>
+
+    <script>
+
+        function fetchAPIData() {
+            let curDate = document.getElementById("date");
+                let weathercon = document.getElementById("weathercon");
+
+                const getCurrentDay = () => {
+                    var weekday = new Array(7);
+                    weekday[0] = "Sunday";
+                    weekday[1] = "Monday";
+                    weekday[2] = "Tue";
+                    weekday[3] = "Wed";
+                    weekday[4] = "Thursday";
+                    weekday[5] = "Friday";
+                    weekday[6] = "Saturday";
+
+                    let currentTime = new Date();
+                    let day = weekday[currentTime.getDay()];
+                    return day;
+                };
+
+                const getCurrentTime = () => {
+                    var months = [
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                    "June",
+                    "July",
+                    "Aug",
+                    "Sept",
+                    "Oct",
+                    "Nov",
+                    "Dec",
+                    ];
+
+                    var now = new Date();
+                    var month = months[now.getMonth()];
+                    var date = now.getDate();
+
+                    let hours = now.getHours();
+                    let mins = now.getMinutes();
+
+                    let periods = " AM";
+
+                    if (hours > 11) {
+                    periods = " PM";
+                    if (hours > 12) hours -= 12;
+                    }
+                    if (mins < 10) {
+                    mins = "0" + mins;
+                    }
+
+                    return `${month} ${date} | ${hours}:${mins}${periods}`;
+                };
+
+                curDate.innerHTML = getCurrentDay() + " | " + getCurrentTime();
+
+                const API = `http://api.openweathermap.org/data/2.5/weather?q=${localStorage.getItem("country")}&appid=b11a7f62ccd058fc98d1bae87a4dd646`;
+                const temp = document.getElementById("temp");
+                const tempmin_max = document.getElementById("tempmin_max");
+                const loc = document.getElementById("loc");
+                const description = document.getElementById("dec");
+
+                function getBack() {
+                    document.querySelector('.box').style.display = "none";
+                    document.querySelector('.gdfgkhj').style.display = "block";
+                }
+
+                let response =  fetch(API);
+
+                async function getData(url) {
+                    const response = await fetch(url);
+
+                    // Storing data in form of JSON
+                    var data = await response.json();
+
+                    console.log(data);
+
+                    let tempStatus = data.weather[0].main;
+
+                    //condition to check sunny or cloudy
+                    if (tempStatus == "Sunny") {
+                        weathercon.innerHTML =
+                        "<i class='fas  fa-sun' style='color: #eccc68;'></i>";
+                    } else if (tempStatus == "Clouds") {
+                        weathercon.innerHTML =
+                        "<i class='fas  fa-cloud' style='color: #f1f2f6;'></i>";
+                    } else if (tempStatus == "Rain") {
+                        weathercon.innerHTML =
+                        "<i class='fas  fa-cloud-rain' style='color: darkgray;'></i>";
+                    } else if(tempStatus == "Clear") {
+                        weathercon.innerHTML =
+                        "<i class='fas  fa-cloud' style='color:#f1f2f6;'></i>";
+                    }
+
+                    temp.innerHTML = `${data.main.temp} &deg;F`;
+                    tempmin_max.innerHTML = ` Min ${data.main.temp_min} &deg;F | ${data.main.temp_max} &deg;F`;
+                    loc.innerHTML = `<i class="fas fa-street-view"></i> ${data.name}, ${data.sys.country}`;
+                    description.innerHTML = `${data.weather[0].description}`;
+                }
+
+                getData(API);
+        }
+
+        function logout() {
+           localStorage.clear();
+           document.querySelector('.box').style.display = "none";
+           document.querySelector('.gdfgkhj').style.display = "clock";
+           document.getElementById("logout").style.display = "none";
+        }
+
+        function check() {
+            if(localStorage.getItem("country") == null == false) {
+                document.querySelector('.box').style.display = "block";
+                document.querySelector('.gdfgkhj').style.display = "none";
+                document.getElementById("logout").style.display = "block";
+                fetchAPIData();
+            }
+
+            document.getElementById('loader').style.display = "none";
+
+        }
+
+        function goButton() {
+            localStorage.setItem('country', $(".c-form__input").val());
+            document.querySelector('.box').style.display = "block";
+            document.querySelector('.gdfgkhj').style.display = "none";
+            document.getElementById("logout").style.display = "block";
+            fetchAPIData();
+        }
+    </script>
+
+</body>
+</html>
